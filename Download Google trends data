@@ -1,0 +1,15 @@
+downloadTrendsData=function(k, year, querry){
+
+data=data.frame()
+for(j in 1:k){
+#Download data
+for(i in 1:12) {
+
+date=paste(i, "%2F", year[j], "%201m", sep="")
+URL=paste("http://www.google.com/trends/trendsReport?hl=en-US&q=", querry, "&date=", date, "&cmpt=q&content=1&export=1", sep="")
+browseURL(URL)
+Sys.sleep(1)
+}
+Sys.sleep(3)
+}
+}
