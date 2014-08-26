@@ -1,3 +1,6 @@
+path.daily="C:/Users/erik.johansson/Dropbox/Hanken/Gradu/Trends data"
+path.weekly="C:/Users/erik.johansson/Dropbox/Hanken/Gradu/Weekly trends data"
+
 importGT=function(path){
 res=list()
 filenames=paste(path, "/", list.files(path), sep="")
