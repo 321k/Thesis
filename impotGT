@@ -1,0 +1,8 @@
+importGT=function(path){
+res=list()
+filenames=paste(path, "/", list.files(path), sep="")
+for (i in 1:length(filenames)){
+res[[i]]=read.csv(filenames[i], header=FALSE, blank.lines.skip=FALSE, stringsAsFactors=FALSE)
+}
+return(res)
+}
