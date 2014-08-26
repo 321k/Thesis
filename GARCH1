@@ -1,0 +1,26 @@
+library(rugarch)
+spec=ugarchspec()
+spec1=ugarchspec()
+spec2=ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1, 1)))
+
+runGarch=function(spec, stocks.f) {
+fit=list()
+for(i in 1:ncol(stocks.f)){
+  returns=stocks.f[,i]
+  returns=returns[-which(is.na(returns)==TRUE)]
+  fit[[i]]=NA
+  
+  errortest=tryCatch(
+    ugarchfit(spec, returns),
+    error=function(e) e
+    )
+
+  if(!inherits(errortest, "error")){
+    fit[[i]]=ugarchfit(spec=spec, data=returns)
+  }
+}
+return(fit)
+}
+
+fit1=runGarch(spec1, stocks.f)
+fit2=runGarch(spec2, stocks.f)
