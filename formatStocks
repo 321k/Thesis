@@ -1,0 +1,17 @@
+formatStocks=function(data){
+  
+  input=data[[1]][,6]
+  output=diff(log(input))
+  
+  
+  for(i in 2:length(data)){
+    input=data[[i]][,6]
+    input=diff(log(input))
+    output=merge(output, input)
+  }
+  output=output[-1,]
+  return(output)
+}
+
+stocks.raw=getstocksGT(GT)
+stocks.f=formatStocks(stocks.raw)
