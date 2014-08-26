@@ -1,0 +1,37 @@
+library(quantmod)
+ftse.components=read.csv("C:/Users/erik.johansson/Dropbox/Hanken/Gradu/4.5.2014/ftse components.csv", sep=",")
+ 
+######################################################
+getstocksGT=function(GT){
+GT.names=names(GT)
+for(i in 1:length(GT.names)){
+GT.names[i]=substr(GT.names[i], 1, nchar(GT.names[i])-2)
+}
+ftse.names=tolower(ftse.components$'Search.term.2')
+index=match(GT.names, ftse.names)
+tickers=as.character(unlist(ftse.components$'Yahoo.symbol'[index]))
+ 
+invisible(Sys.setlocale("LC_MESSAGES", "C"))
+invisible(Sys.setlocale("LC_TIME", "C"))
+startDate=as.Date("2004-01-01")
+endDate=as.Date("2013-12-31")
+for(i in 1:length(tickers)){
+data[[i]]=getSymbols(tickers[i], auto.assign=FALSE, src="yahoo", from=startDate, to=endDate)
+}
+ 
+return(data)
+}
+ 
+######################################################
+formatStocks=function(data){
+ 
+output=data[[1]][,6]
+for(i in 2:length(data)){
+output=merge(output, data[[i]][,6])
+}
+#output=data.frame(Date=time(output), output, check.names=FALSE, row.names=NULL)
+return(output)
+}
+
+stocks=getstocksGT(GT)
+stocks=formatStocks(stocks)
