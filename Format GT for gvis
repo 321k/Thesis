@@ -1,0 +1,20 @@
+gvisFormater=function(GT) {
+
+  for(i in 1:ncol(GT)) {
+    GT.real[[i]]=GT[i]
+    GT.real[[i]][2]=rownames(GT.real[[i]])
+    GT.real[[i]]=GT.real[[i]][,c(2,1)]
+    GT.real[[i]]=GT.real[[i]][which(is.finite(GT.real[[i]][,2])),]
+    GT.real[[i]][,1]=as.Date(GT.real[[i]][,1], "%Y-%m-%d")
+    names(GT.real[[i]])=c("Date", "SVI")
+  }
+
+  names(GT.real)=names(GT)
+
+  return(GT.real)
+}
+
+GT.real=gvisFormater(GT)
+
+i=1
+line=gvisLineChart(GT.real[[i]], xvar="Date", yvar="SVI")
