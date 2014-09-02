@@ -1,0 +1,40 @@
+table.sum=data.frame(names(GT))
+table.sum[2]=names(stocks.f)
+table.sum[3]=ftse.components[index,3]
+names(table.sum)=c("Querry", "Ticker", "Stock")
+
+library(e1071)
+library(tseries)
+table.sum.GT=table.sum[1]
+
+kurt=numeric()
+skew=numeric()
+m=numeric()
+med=numeric()
+range=numeric()
+sd=numeric()
+JB=numeric()
+JBp=numeric()
+
+for(i in 1:length(GT)) {
+  data=GT[which(is.finite(GT[,i])),i]
+  kurt=append(kurt, kurtosis(data))
+  skew=append(skew, skewness(data))
+  m=append(m, mean(data))
+  med=append(med, median(data))
+  range=append(range, range(data)[2])
+  sd=append(sd, sd(data))
+  JB=append(JB, jarque.bera.test(data)[[1]])
+  JBp=append(JBp, jarque.bera.test(data)[[3]])
+  }
+
+table.sum.GT[2]=m
+table.sum.GT[3]=med
+table.sum.GT[4]=kurt
+table.sum.GT[5]=skew
+table.sum.GT[6]=range
+table.sum.GT[7]=sd
+table.sum.GT[8]=JB
+table.sum.GT[9]=JBp
+
+names(table.sum.GT)=c("Querry", "Mean", "Median", "Kurt.", "Skew.", "Range", "S.d.", "JB", "P-value")
