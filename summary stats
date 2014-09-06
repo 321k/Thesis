@@ -1,3 +1,5 @@
+library(tseries)
+
 ##### Table with the names and querries of the sample
 
 table.sum=data.frame(names(GT))
@@ -6,6 +8,7 @@ table.sum[3]=ftse.components[index,3]
 names(table.sum)=c("Querry", "Ticker", "Stock")
 
 ##### Table with the summary statistics for the Google Trends data
+table.sum2=function(table.sum, GT){
 
 library(e1071)
 library(tseries)
@@ -43,6 +46,9 @@ table.sum.GT[9]=JBp
 
 names(table.sum.GT)=c("Querry", "Mean", "Median", "Kurt.", "Skew.", "Range", "S.d.", "JB", "P-value")
 
+return(table.sum.GT)
+}
+
 ##### Unit root test for Google Trends data
 
 adf=numeric()
@@ -50,5 +56,5 @@ adfp=numeric()
 for(i in 1:length(GT)) {
   data=GT[which(is.finite(GT[,i])),i]
   adf=append(adf, adf.test(data, k=0)[[1]])
-  adfp=append(adf, adf.test(data, k=0)[[4]])
+  adfp=append(adfp, adf.test(data, k=0)[[4]])
 }
