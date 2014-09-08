@@ -50,11 +50,36 @@ return(table.sum.GT)
 }
 
 ##### Unit root test for Google Trends data
-
-adf=numeric()
+unitrootTable=function(GT) {
+adf=numeric() 
 adfp=numeric()
 for(i in 1:length(GT)) {
   data=GT[which(is.finite(GT[,i])),i]
   adf=append(adf, adf.test(data, k=0)[[1]])
   adfp=append(adfp, adf.test(data, k=0)[[4]])
 }
+
+PP=numeric()
+PPp=numeric()
+for(i in 1:length(GT)) {
+  data=GT[which(is.finite(GT[,i])),i]
+  PP=append(PP, PP.test(data)[[1]])
+  PPp=append(PPp, PP.test(data)[[3]])
+}
+
+KPSS=numeric()
+KPSSp=numeric()
+for(i in 1:length(GT)) {
+  data=GT[which(is.finite(GT[,i])),i]
+  KPSS=append(KPSS, kpss.test(data, null="Trend")[[1]])
+  KPSSp=append(KPSSp, kpss.test(data, null="Trend")[[3]])
+}
+
+unitRootTable=data.frame(names(GT), adf, adfp, PP, PPp, KPSS, KPSSp)
+
+return(unitRootTable)
+}
+
+
+
+
