@@ -1,0 +1,36 @@
+###This script creates a table containing how each querry relates to another.
+###Download Google Trends files with two search querries. The querry to the left will be divided with the querry to the right
+
+formatRelGT=function(path){
+
+relGT.raw=importGT(path)
+relGT.sum=summaryTable(relGT.raw)
+relGT.f=formatGT(relGT.raw, relGT.sum)
+output=data.frame(relGT.f[[1]][1])
+names_list="Date"
+
+for(i in 1:length(relGT.f)){
+data=relGT.f[[i]]
+data[,1]=as.Date(data[,1], "%Y-%m-%d")
+data[,2]=as.numeric(as.character(data[,2]))
+data[,3]=as.numeric(as.character(data[,3]))
+data[,4]=data[,2]/data[,3]
+
+data=data[-which(is.na(data[,2])),]
+
+data[-which(is.finite(data[,4])),4]=max(data[which(is.finite(data[,4])),4])*1.5
+data[which(data[,4]==0),4]=min(data[-which(data[,4]==0),4])/2
+
+names_list=append(names_list, names(data[2]))
+
+output=merge(data[-c(2,3)], output, by="Date", all=T)
+}
+
+output=output[-which(is.na(output[,2])),]
+names(output)=names_list
+
+return(output)
+}
+
+relGT=formatRelGT(path)
+
