@@ -161,25 +161,3 @@ output=list(reindex, GT.daily, GT.weekly)
 return(output)
 }
  
-GT.raw=importGT(path.daily)
-GT.sum=summaryTable(GT.raw)
-GT.f=formatGT(GT.raw, GT.sum)
-GT.m=mergeGT(GT.f)
- 
-GTW.raw=importGT(path.weekly)
-GTW.sum=summaryTable(GTW.raw)
-GTW.f=formatGT(GTW.raw, GTW.sum)
-GTW.m=mergeGT(GTW.f)
- 
-reindex=reindexGT(GT.m, GTW.m)
- 
-GT.i=reindex[[1]][1:3653,]
-GT.daily=reindex[[2]][1:3653,]
-GT.weekly=reindex[[3]][1:3653,]
-GT.date=as.Date(rownames(GT.daily), "%Y-%m-%d")
- 
-GT=GT.daily/GT.i
- 
-i=1
-plot(GT.date, GT[,i], type="l")
-lines(GT.date, GT.weekly[,i], col="red")
