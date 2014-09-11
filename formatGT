@@ -1,37 +1,41 @@
 summaryTable=function(rawGT){
-  x=data.frame()
+  x=data.frame(matrix(NA, nrow=length(rawGT), ncol=10))
   for(i in 1:length(rawGT)){
-
 #List all querries
-  x[i,1]=substr(rawGT[[i]][1,1], start=22, stop=70)
-
+    x[i,1]=substr(rawGT[[i]][1,1], start=22, stop=70)
 #Save the dimension
-  x[i,2]=dim(rawGT[[i]])[1]
-  x[i,3]=dim(rawGT[[i]])[2]
-
+    x[i,2]=dim(rawGT[[i]])[1]
+    x[i,3]=dim(rawGT[[i]])[2]
 #Save the number of empty rows
-  x[i,4]=length(which(rawGT[[i]][1]==""))
-
+    x[i,4]=length(which(rawGT[[i]][1]==""))
 #Define start and end of time series, save length of date
-  if(x[i,4]>1){
-    x[i,5]=which(rawGT[[i]][1]=="")[1]+3
-    x[i,6]=which(rawGT[[i]][1]=="")[2]-1
-    x[i,7]=nchar(rawGT[[i]][x[i,5],1])
-  } else {
-  x[i,5]=NA
-  x[i,6]=NA
-  x[i,7]=0
-  }
-
+    if(x[i,4]>1){
+      x[i,5]=which(rawGT[[i]][1]=="")[1]+3
+      x[i,6]=which(rawGT[[i]][1]=="")[2]-1
+      x[i,7]=nchar(rawGT[[i]][x[i,5],1])
+    } else {
+      x[i,5]=NA
+      x[i,6]=NA
+      x[i,7]=0
+    }
 #Classify the querry
-  if(x[i,7]==0) {x[i,8]="Empty"}
-  if(x[i,7]==7) {x[i,8]="Monthly"}
-  if(x[i,7]==23) {x[i,8]="Weekly"}
-  if(x[i,7]==10) {x[i,8]="Daily"}
-  if(is.na(x[i,8])) {x[i,8]="Empty"}
+    if(x[i,7]==0) {x[i,8]="Empty"}
+    if(x[i,7]==7) {x[i,8]="Monthly"}
+    if(x[i,7]==23) {x[i,8]="Weekly"}
+    if(x[i,7]==10) {x[i,8]="Daily"}
+    if(is.na(x[i,8])) {x[i,8]="Empty"}
+
+    temp=which(grepl("Top cities", rawGT[[i]][,1]))
+    if(length(temp)>0) {
+      x[i, 9]=temp
+    }
+
+    temp=which(grepl("Top region", rawGT[[i]][,1]))
+    if(length(temp)>0) {
+      x[i,10]=temp
+    }
   }
-  
-  colnames(x)=c("Querry", "Rows", "Columns", "Empty rows", "Start", "End", "Date", "Type")
+  colnames(x)=c("Querry", "Rows", "Columns", "Empty rows", "Start", "End", "Date", "Type", "Top cities", "Top region")
   return(x)
 }
 
