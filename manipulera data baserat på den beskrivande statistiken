@@ -1,0 +1,77 @@
+#Replace missing values with 0
+for(i in 1:nrow(GT){
+GT[-which(is.finite(GT[,i])),i]=0
+}
+
+#Detrend
+GT.detrend=data.frame(matrix(NA, nrow=nrow(GT), ncol=ncol(GT)))
+names(GT.detrend)=names(GT)
+for(i in 1:ncol(GT)){
+GT.detrend[,i]=lm(GT[,i]~GT.date)$residuals
+}
+
+#Remove seasonality by regressing against month and storing residuals
+GT.date=as.Date(rownames(GT), "%Y-%m-%d")
+reg_output=list()
+GT.season=data.frame(matrix(NA, nrow=nrow(GT), ncol=ncol(GT)))
+names(GT.season)=names(GT)
+for(i in 1:ncol(GT)){
+data=data.frame(GT.detrend[i], as.factor(months(GT.date)))
+GT.season[,i]=lm(data[,1]~data[,2])$residual
+reg_output[[i]]=lm(data[,1]~data[,2])
+}
+
+#Remove seasonality by regressing against week day. This is the one used for the thesis.
+GT.weekday=data.frame(matrix(NA, nrow=nrow(GT), ncol=ncol(GT)))
+names(GT.weekday)=names(GT)
+reg_output=list()
+for(i in 1:ncol(GT)){
+data=data.frame(GT.detrend[i], as.factor(weekdays(GT.date)))
+GT.weekday[,i]=lm(data[,1]~data[,2])$residual
+reg_output[[i]]=lm(data[,1]~data[,2])
+}
+
+#Collect the data into tables
+weekday_data=data.frame(matrix(NA, ncol=8, nrow=length(reg_output)))
+weekday_data_p=data.frame(matrix(NA, ncol=8, nrow=length(reg_output)))
+
+names(weekday_data)=c("Company", "Intercept", "Saturday", "Monday", "Friday", "Sunday", "Tuesday", "Thursday")
+names(weekday_data_p)=c("Company", "Intercept", "Saturday", "Monday", "Friday", "Sunday", "Tuesday", "Thursday")
+
+for(i in 1:length(reg_output)){
+weekday_data[i,1]=names(GT[i])
+weekday_data_p[i,1]=names(GT[i])
+
+for(j in 1:7){
+weekday_data[i,1+j]=reg_output[[i]]$coefficients[j]
+weekday_data_p[i,1+j]=summary(reg_output[[i]])$coefficients[j,4]
+}
+}
+
+#Making some plots. Compare weekday removed to month removed to base case
+par(mfrow=c(3,1))
+start=3000
+stop=nrow(GT)
+plot(GT.date[start:stop], GT[start:stop,i], type="l", xlab="Date", ylab=names(GT[i]), main="No seasonal adjustment")
+plot(GT.date[start:stop], GT.season[start:stop,i], type="l", xlab="Date", ylab=names(GT[i]), main="Month dummy")
+plot(GT.date[start:stop], GT.weekday[start:stop,i], type="l", xlab="Date", ylab=names(GT[i]), main="Weekday dummy")
+
+#Plot the histograms
+par(mfrow=c(2,2))
+
+hist(GT[,i])
+hist(GT.detrend[,i])
+hist(GT.weekday[,i])
+hist(GT.season[,i])
+
+plot(GT.season[,i], type="l")
+lines(GT[,i], col="red")
+
+par(mfrow=c(2,2))
+
+#Test normality with JB
+jarque.bera.test(GT[,i])
+jarque.bera.test(GT.detrend[,i])
+jarque.bera.test(GT.weekday[,i])
+jarque.bera.test(GT.season[,i])
+
