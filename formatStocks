@@ -1,11 +1,11 @@
-formatStocks=function(data){
+formatStocks=function(data, col=6){
   
-  input=data[[1]][,6]
+  input=data[[1]][,col]
   output=diff(log(input))
   
   
   for(i in 2:length(data)){
-    input=data[[i]][,6]
+    input=data[[i]][,col]
     input=diff(log(input))
     output=merge(output, input)
   }
