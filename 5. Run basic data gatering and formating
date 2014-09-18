@@ -1,6 +1,6 @@
 ### GT Data
 
-#GT.raw=importGT(path.daily)
+GT.raw=importGT(path.daily)
 GT.sum=summaryTable(GT.raw)
 GT.f=formatGT(GT.raw, GT.sum)
 GT.m=mergeGT(GT.f)
