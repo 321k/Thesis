@@ -39,6 +39,3 @@ formatStocks=function(data, col=6){
   output=output[-1,]
   return(output)
 }
-
-stocks.raw=getstocksGT(GT)
-stocks.f=formatStocks(stocks.raw)
