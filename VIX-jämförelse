@@ -1,0 +1,34 @@
+path.vix="C:/Users/erik.johansson/Dropbox/Hanken/Gradu/FTSE100 VOLAT.INDX .csv"
+ftse.vix=read.csv(path.vix, sep=";")
+ftse.vix=ftse.vix[,c(3,7)]
+ftse.vix.date=as.Date(as.character(ftse.vix[,1]),"%d.%m.%Y")
+rownames(ftse.vix)=ftse.vix.date
+ftse.vix=ftse.vix[2]
+ftse.vix=as.xts(ftse.vix)
+index(ftse.vix)=ftse.vix.date
+ftse.vix=merge(ftse.vix, GT.detrended$'FTSE 100')
+
+
+### And a plot of the data
+
+#start=2000
+#stop=nrow(temp)-500
+
+
+plot.new()
+temp=as.data.frame(ftse.vix)
+
+date=as.Date(rownames(temp), "%Y-%m-%d")
+par(mfrow=c(2,1))
+plot(date[start:stop], temp[,1][start:stop], type="l", ylab="Implied volatility, FTSE 100", main="FTSE 100", xlab="Date")
+par(new=T)
+plot(date[start:stop], temp[,2][start:stop], type="l", col="red", axes=F, xlab=NA, ylab=NA)
+axis(side=4)
+mtext(side=4, line=3, "Searches for FTSE 100")
+
+plot(temp[,2][start:stop], temp[,1][start:stop], ylab="Implied volatility", xlab="Searches, FTSE 100")
+y=temp[,1][start:stop]
+x=temp[,2][start:stop]
+fit=lm(y~x)
+summary(fit)
+abline(fit)
