@@ -1,0 +1,53 @@
+### GT Data
+
+#GT.raw=importGT(path.daily)
+GT.sum=summaryTable(GT.raw)
+GT.f=formatGT(GT.raw, GT.sum)
+GT.m=mergeGT(GT.f)
+ 
+GTW.raw=importGT(path.weekly)
+GTW.sum=summaryTable(GTW.raw)
+GTW.f=formatGT(GTW.raw, GTW.sum)
+GTW.m=mergeGT(GTW.f)
+ 
+reindex=reindexGT(GT.m, GTW.m)
+ 
+GT.i=reindex[[1]][1:3653,]
+GT.daily=reindex[[2]][1:3653,]
+GT.weekly=reindex[[3]][1:3653,]
+GT.date=as.Date(rownames(GT.daily), "%Y-%m-%d")
+ 
+GT=GT.daily/GT.i
+names(GT)=ftse.components[index,6]
+
+###Stocks data
+
+stocks.raw=getstocksGT(GT)
+stocks.f=formatStocks(stocks.raw)
+stocks.var=stocks.f^2
+
+data=stocks.raw
+input=data[[1]][,5]
+stocks.volume=input
+for(i in 2:length(data)){
+input=data[[i]][,5]
+input=diff(log(input))
+stocks.volume=merge(output, input)
+}
+stocks.volume=stocks.volume[,-72]
+
+GT.xts=as.xts(GT)
+index(GT.xts)=as.Date(rownames(GT), "%Y-%m-%d")
+rownames(GT.weekday)=rownames(GT)
+GT.weekday.xts=as.xts(GT.weekday)
+index(GT.weekday.xts)=as.Date(rownames(GT), "%Y-%m-%d")
+
+GT.list=list()
+for(i in 1:length(GT)){
+GT.list[[i]]=stocks.volume[,i]
+GT.list[[i]]=merge(GT.list[[i]], stocks.f[,i])
+GT.list[[i]]=merge(GT.list[[i]], stocks.var[,i])
+GT.list[[i]]=merge(GT.list[[i]], GT.xts[,i])
+GT.list[[i]]=merge(GT.list[[i]], GT.weekday.xts[,i])
+}
+
