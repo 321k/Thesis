@@ -80,6 +80,29 @@ unitRootTable=data.frame(names(GT), adf, adfp, PP, PPp, KPSS, KPSSp)
 return(unitRootTable)
 }
 
+#### Plots
+par(mfrow=c(2,2))
+i=1
+#plot(as.data.frame(GT.list[[i]])[,1], type="l", xlab="Date", ylab=names(GT[i]))
+plot(as.data.frame(GT.list[[i]])[,3], type="l", xlab="Date", ylab=names(GT[i]))
+plot(as.data.frame(GT.list[[i]])[,5], type="l", xlab="Date", ylab=names(GT[i]))
+plot(as.data.frame(GT.list[[i]])[,1], as.data.frame(GT.list[[i]])[,3], , xlab="Traded volume", ylab="Volatility")
+plot(as.data.frame(GT.list[[i]])[,1], as.data.frame(GT.list[[i]])[,5], , xlab="SVI", ylab="Volatility")
+
+par(mfrow=c(3,1))
+plot(as.data.frame(GT.list[[i]])[,1][start:stop], type="l", xlab="Date", ylab=names(GT[i]), main="Traded volume")
+plot(as.data.frame(GT.list[[i]])[,3][start:stop], type="l", xlab="Date", ylab=names(GT[i]), main="Volatility")
+plot(as.data.frame(GT.list[[i]])[,5][start:stop], type="l", xlab="Date", ylab=names(GT[i]), main="SVI")
+
+
+par(mfrow=c(3,2))
+plot(as.data.frame(GT.list[[i]])[,1][start:stop], type="l", xlab="Date", ylab=names(GT[i]), main="Traded volume")
+plot(as.data.frame(GT.list[[i]])[,5], as.data.frame(GT.list[[i]])[,1], , xlab="SVI", ylab="Traded volume")
+plot(as.data.frame(GT.list[[i]])[,3][start:stop], type="l", xlab="Date", ylab=names(GT[i]), main="Volatility")
+plot(as.data.frame(GT.list[[i]])[,5], as.data.frame(GT.list[[i]])[,3], , xlab="SVI", ylab="Volatility")
+plot(as.data.frame(GT.list[[i]])[,5][start:stop], type="l", xlab="Date", ylab=names(GT[i]), main="SVI")
+plot(as.data.frame(GT.list[[i]])[,1], as.data.frame(GT.list[[i]])[,3], , xlab="Traded volume", ylab="Volatility")
+i=i+1
 
 
 
