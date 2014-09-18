@@ -23,3 +23,22 @@ getstocksGT=function(GT){
 
  return(data)
 }
+
+
+formatStocks=function(data, col=6){
+  
+  input=data[[1]][,col]
+  output=diff(log(input))
+  
+  
+  for(i in 2:length(data)){
+    input=data[[i]][,col]
+    input=diff(log(input))
+    output=merge(output, input)
+  }
+  output=output[-1,]
+  return(output)
+}
+
+stocks.raw=getstocksGT(GT)
+stocks.f=formatStocks(stocks.raw)
