@@ -22,8 +22,10 @@ GT.date=as.Date(rownames(GT.daily), "%Y-%m-%d")
 GT=GT.daily/GT.i
 names(GT)=ftse.components[index,6]
 
-###Stocks data
 
+
+###Stocks data
+#A time series trend is extracted for stocks.volume_d in accordance with Andersen (1996), "Return Volatility and Trading Volume: An Information Flow Interpretation of Stochastic Volatility"
 stocks.raw=getstocksGT(GT)
 stocks.f=formatStocks(stocks.raw)
 stocks.var=stocks.f^2
@@ -31,25 +33,68 @@ stocks.var=stocks.f^2
 data=stocks.raw
 input=data[[1]][,5]
 stocks.volume=input
+stocks.volume_d=lm(input~index(input))$residuals
+
 for(i in 2:length(data)){
 input=data[[i]][,5]
-input=diff(log(input))
+input_detrended=lm(input~index(input))$residuals
+
 stocks.volume=merge(stocks.volume, input)
+stocks.volume_d=merge(stocks.volume_d, input_detrended)
 }
 stocks.volume=stocks.volume[,-72]
+stocks.volume_d=stocks.volume_d[,-72]
 
+#Now we convert the Google Trends data to an xts object
 GT.xts=as.xts(GT)
-index(GT.xts)=as.Date(rownames(GT), "%Y-%m-%d")
-rownames(GT.weekday)=rownames(GT)
-GT.weekday.xts=as.xts(GT.weekday)
-index(GT.weekday.xts)=as.Date(rownames(GT), "%Y-%m-%d")
 
+#I will use the zoo package for handling missing values by interpolation
+for(i in 1:ncol(GT.xts)){
+GT.xts[which(is.infinite(GT.xts[,i])),i]=NA
+}
+GT.xts=na.approx(GT.xts, na.rm=F)
+
+#Format the date
+index(GT.xts)=as.Date(rownames(GT), "%Y-%m-%d")
+
+#Once the Google Trends data has been compiled, we need to extract a time series trend and a weekly trend.
+GT.detrended=data.frame(matrix(NA, nrow=nrow(GT.xts), ncol=ncol(GT.xts)))
+names(GT.detrended)=names(GT)
+reg_output=list()
+for(i in 1:ncol(GT.xts)){
+data=data.frame(GT.xts[,i], as.factor(weekdays(GT.date)))
+GT.detrended[,i]=residuals(lm(data[,1]~data[,2]+GT.date ,na.action=na.exclude))
+reg_output[[i]]=lm(data[,1]~data[,2])
+}
+GT.detrended=as.xts(GT.detrended)
+index(GT.detrended)=as.Date(GT.date, "%Y-%m-%d")
+
+
+#Finally, we create a list containing a data frame for all the information we want to investigate for each stock
 GT.list=list()
 for(i in 1:length(GT)){
-GT.list[[i]]=stocks.volume[,i]
+GT.list[[i]]=stocks.volume_d[,i]
 GT.list[[i]]=merge(GT.list[[i]], stocks.f[,i])
 GT.list[[i]]=merge(GT.list[[i]], stocks.var[,i])
-GT.list[[i]]=merge(GT.list[[i]], GT.xts[,i])
-GT.list[[i]]=merge(GT.list[[i]], GT.weekday.xts[,i])
+GT.list[[i]]=merge(GT.list[[i]], GT.detrended[,i])
+colnames(GT.list[[i]])=c("Traded volume", "Return", "Return^2", "SVI")
 }
+names(GT.list)=tolower(ftse.components[index,6])
+
+#Here are some nice graphs to show to compare the raw data to the detrended data
+start=3500
+stop=dim(GT)[1]
+p1=hist(GT[,i])
+p2=hist(GT.detrended[,i])
+par(mfrow=c(3,2))
+plot( p1, col=rgb(0,0,1,1/4),xlim=c(min(p1$breaks, p2$breaks),max(p1$breaks, p2$breaks)), main=names(GT)[i])
+plot( p2, col=rgb(1,0,0,1/4), xlim=c(min(p1$breaks, p2$breaks),max(p1$breaks, p2$breaks)), add=T)
+plot(GT[,i], GT.detrended[,i], main=names(GT)[i])
+plot(GT.date[start:stop], GT[,i][start:stop], type="l", main=names(GT)[i])
+plot(GT.date, GT[,i], type="l", main=names(GT)[i])
+plot(GT.date[start:stop], GT.detrended[,i][start:stop], type="l", main=names(GT)[i])
+plot(GT.date, GT.detrended[,i], type="l", main=names(GT)[i])
+i=i+1
+
+
 
