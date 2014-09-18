@@ -34,7 +34,7 @@ stocks.volume=input
 for(i in 2:length(data)){
 input=data[[i]][,5]
 input=diff(log(input))
-stocks.volume=merge(output, input)
+stocks.volume=merge(stocks.volume, input)
 }
 stocks.volume=stocks.volume[,-72]
 
