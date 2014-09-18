@@ -68,7 +68,7 @@ reg_output[[i]]=lm(data[,1]~data[,2])
 }
 GT.detrended=as.xts(GT.detrended)
 index(GT.detrended)=as.Date(GT.date, "%Y-%m-%d")
-
+names(GT.detrended)=ftse.components[index,6]
 
 #Finally, we create a list containing a data frame for all the information we want to investigate for each stock
 GT.list=list()
