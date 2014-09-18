@@ -1,4 +1,6 @@
 ### GT Data
+path.daily="C:/Users/erik.johansson/Dropbox/Hanken/Gradu/Trends data"
+path.weekly="C:/Users/erik.johansson/Dropbox/Hanken/Gradu/Weekly trends data"
 
 GT.raw=importGT(path.daily)
 GT.sum=summaryTable(GT.raw)
