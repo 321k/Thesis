@@ -1,4 +1,13 @@
 ### GT Data
+
+#"index" is a reference to the ftse components data frame for all companies in the sample
+GT.names=names(GT)
+for(i in 1:length(GT.names)){
+GT.names[i]=substr(GT.names[i], 1, nchar(GT.names[i])-2)
+}
+ftse.names=tolower(ftse.components$'Search.term.2')
+index=match(GT.names, ftse.names)
+
 path.daily="C:/Users/erik.johansson/Dropbox/Hanken/Gradu/Trends data"
 path.weekly="C:/Users/erik.johansson/Dropbox/Hanken/Gradu/Weekly trends data"
 
@@ -62,10 +71,11 @@ GT.detrended=data.frame(matrix(NA, nrow=nrow(GT.xts), ncol=ncol(GT.xts)))
 names(GT.detrended)=names(GT)
 reg_output=list()
 for(i in 1:ncol(GT.xts)){
-data=data.frame(GT.xts[,i], as.factor(weekdays(GT.date)))
-GT.detrended[,i]=residuals(lm(data[,1]~data[,2]+GT.date ,na.action=na.exclude))
-reg_output[[i]]=lm(data[,1]~data[,2])
+ data=data.frame(GT.xts[,i], as.factor(weekdays(GT.date)))
+ GT.detrended[,i]=residuals(lm(data[,1]~data[,2]+GT.date ,na.action=na.exclude))
+ reg_output[[i]]=lm(data[,1]~data[,2])
 }
+rownames(GT.detrended)=GT.date
 GT.detrended=as.xts(GT.detrended)
 index(GT.detrended)=as.Date(GT.date, "%Y-%m-%d")
 names(GT.detrended)=ftse.components[index,6]
