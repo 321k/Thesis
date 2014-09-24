@@ -1,12 +1,6 @@
 ### GT Data
 
-#"index" is a reference to the ftse components data frame for all companies in the sample
-GT.names=names(GT)
-for(i in 1:length(GT.names)){
-GT.names[i]=substr(GT.names[i], 1, nchar(GT.names[i])-2)
-}
-ftse.names=tolower(ftse.components$'Search.term.2')
-index=match(GT.names, ftse.names)
+
 
 path.daily="C:/Users/erik.johansson/Dropbox/Hanken/Gradu/Trends data"
 path.weekly="C:/Users/erik.johansson/Dropbox/Hanken/Gradu/Weekly trends data"
@@ -29,12 +23,25 @@ GT.weekly=reindex[[3]][1:3653,]
 GT.date=as.Date(rownames(GT.daily), "%Y-%m-%d")
  
 GT=GT.daily/GT.i
+
+#"index" is a reference to the ftse components data frame for all companies in the sample
+GT.names=names(GT)
+for(i in 1:length(GT.names)){
+GT.names[i]=substr(GT.names[i], 1, nchar(GT.names[i])-2)
+}
+ftse.names=tolower(ftse.components$'Search.term.2')
+index=match(GT.names, ftse.names)
+
 names(GT)=ftse.components[index,6]
 
 
 
 ###Stocks data
 #A time series trend is extracted for stocks.volume_d in accordance with Andersen (1996), "Return Volatility and Trading Volume: An Information Flow Interpretation of Stochastic Volatility"
+
+invisible(Sys.setlocale("LC_MESSAGES", "C"))
+invisible(Sys.setlocale("LC_TIME", "C"))
+
 stocks.raw=getstocksGT(GT)
 stocks.f=formatStocks(stocks.raw)
 stocks.var=stocks.f^2
@@ -97,13 +104,13 @@ stop=dim(GT)[1]
 p1=hist(GT[,i])
 p2=hist(GT.detrended[,i])
 par(mfrow=c(3,2))
-plot( p1, col=rgb(0,0,1,1/4),xlim=c(min(p1$breaks, p2$breaks),max(p1$breaks, p2$breaks)), main=names(GT)[i])
+plot( p1, col=rgb(0,0,1,1/4),xlim=c(min(p1$breaks, p2$breaks),max(p1$breaks, p2$breaks)), main=names(GT)[i], xlab="red=detrended, blue=raw data")
 plot( p2, col=rgb(1,0,0,1/4), xlim=c(min(p1$breaks, p2$breaks),max(p1$breaks, p2$breaks)), add=T)
-plot(GT[,i], GT.detrended[,i], main=names(GT)[i])
-plot(GT.date[start:stop], GT[,i][start:stop], type="l", main=names(GT)[i])
-plot(GT.date, GT[,i], type="l", main=names(GT)[i])
-plot(GT.date[start:stop], GT.detrended[,i][start:stop], type="l", main=names(GT)[i])
-plot(GT.date, GT.detrended[,i], type="l", main=names(GT)[i])
+plot(GT[,i], GT.detrended[,i], main=names(GT)[i], xlab="Raw data", ylab="Detrended data")
+plot(GT.date[start:stop], GT[,i][start:stop], type="l", main=names(GT)[i], xlab="Raw data", ylab="SVI")
+plot(GT.date, GT[,i], type="l", main=names(GT)[i], xlab="Raw data", ylab="SVI")
+plot(GT.date[start:stop], GT.detrended[,i][start:stop], type="l", main=names(GT)[i], xlab="Detrended data", ylab="SVI")
+plot(GT.date, GT.detrended[,i], type="l", main=names(GT)[i], xlab="Detrended data", ylab="SVI")
 i=i+1
 
 
