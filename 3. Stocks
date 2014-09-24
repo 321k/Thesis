@@ -5,11 +5,8 @@ ftse.components=read.csv("C:/Users/erik.johansson/Dropbox/Hanken/Gradu/4.5.2014/
 getstocksGT=function(GT){
 data=list()
  GT.names=names(GT)
- for(i in 1:length(GT.names)){
-  GT.names[i]=substr(GT.names[i], 1, nchar(GT.names[i])-2)
- }
 
- ftse.names=tolower(ftse.components$'Search.term.2')
+ ftse.names=as.character(ftse.components$'Search.term.2')
  index=match(GT.names, ftse.names)
  tickers=as.character(unlist(ftse.components$'Yahoo.symbol'[index]))
  
