@@ -3,11 +3,13 @@ spec=ugarchspec()
 spec1=ugarchspec()
 spec2=ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1, 1)))
 
-runGarch=function(spec, stocks.f) {
+runGarch=function(spec, GT.list) {
 fit=list()
-for(i in 1:ncol(stocks.f)){
-  returns=stocks.f[,i]
-  returns=returns[-which(is.na(returns)==TRUE)]
+for(i in 1:length(GT.list)){
+  data=GT.list[[i]]
+  returns=data[,2]
+  #returns=na.approx(returns, na.rm=F)
+  returns=returns[-which(is.na(returns))]
   fit[[i]]=NA
   
   errortest=tryCatch(
@@ -22,5 +24,5 @@ for(i in 1:ncol(stocks.f)){
 return(fit)
 }
 
-fit1=runGarch(spec1, stocks.f)
-fit2=runGarch(spec2, stocks.f)
+fit1=runGarch(spec1, GT.list)
+fit2=runGarch(spec2, GT.list)
