@@ -26,3 +26,73 @@ return(fit)
 
 fit1=runGarch(spec1, GT.list)
 fit2=runGarch(spec2, GT.list)
+
+
+### The tests here are based on the article:
+#http://faculty.washington.edu/ezivot/research/practicalgarchfinal.pdf
+library(e1071) 
+library(tseries)
+
+#Data for FTSE 100
+data=GT.list[[29]]
+returns=data[-which(is.na(data[,2])),2]
+
+par(mfrow=c(3,1))
+plot(returns)
+plot(returns^2)
+plot(abs(returns))
+
+acf(returns)
+acf(returns^2)
+acf(abs(returns))
+
+tests=list()
+i=1
+tests[[i]]=jarque.bera.test(returns)
+names(tests)[i]="Jarque-Bera test"
+i=i+1
+tests[[i]]=mean(returns)
+names(tests)[i]="Mean"
+i=i+1
+tests[[i]]=median(returns)
+names(tests)[i]="Median"
+i=i+1
+tests[[i]]=min(returns)
+names(tests)[i]="Min"
+i=i+1
+tests[[i]]=max(returns)
+names(tests)[i]="Max"
+i=i+1
+tests[[i]]=sd(returns)
+names(tests)[i]="Standard deviation"
+i=i+1
+tests[[i]]=skewness(returns)
+names(tests)[i]="Skewness"
+i=i+1
+tests[[i]]=kurtosis(returns)
+names(tests)[i]="Kurtosis"
+i=i+1
+#Stylized facts: volatility clustering, fat tails, volatility mean reversion, and asymmetry
+#A GARCH model with normal errors can replicate some of the fat-tailed behavior observed in financial time series
+#(3) http://faculty.washington.edu/ezivot/research/practicalgarchfinal.pdf
+
+#The stylized fact of volatility clustering in returns manifests itself as autocorrelation in squared and absolute returns
+#or in the residuals from the estimated conditional mean equation.
+#The significance of these autocorrelations may be tested using the Ljung-Box or modified Q-statistic
+#(4) http://faculty.washington.edu/ezivot/research/practicalgarchfinal.pdf
+
+BoxTest=list()
+i=1
+BoxTest[[i]]=Box.test(returns^2, lag=1, type=("Ljung-Box"), fitdf=0)
+i=i+1
+BoxTest[[i]]=Box.test(returns^2, lag=5, type=("Ljung-Box"), fitdf=0)
+i=i+1
+BoxTest[[i]]=Box.test(returns^2, lag=10, type=("Ljung-Box"), fitdf=0)
+
+#Model selection
+#str(fit)
+spec1=ugarchspec()
+
+fit1=ugarchfit(spec1, returns)
+infocriteria(fit1)
+
