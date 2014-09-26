@@ -89,10 +89,66 @@ BoxTest[[i]]=Box.test(returns^2, lag=5, type=("Ljung-Box"), fitdf=0)
 i=i+1
 BoxTest[[i]]=Box.test(returns^2, lag=10, type=("Ljung-Box"), fitdf=0)
 
-#Model selection
+#Model selection, most negative information criteria is best
 #str(fit)
-spec1=ugarchspec()
+spec=list()
+i=1
+spec[[i]]=ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1, 0)))
+i=i+1
+spec[[i]]=ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(2, 0)))
+i=i+1
+spec[[i]]=ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(3, 0)))
+i=i+1
+spec[[i]]=ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(4, 0)))
+i=i+1
+spec[[i]]=ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(5, 0)))
+i=i+1
+spec[[i]]=ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1, 1)))
+i=i+1
+spec[[i]]=ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1, 2)))
+i=i+1
+spec[[i]]=ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(2, 1)))
+i=i+1
+spec[[i]]=ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(2, 2)))
 
-fit1=ugarchfit(spec1, returns)
-infocriteria(fit1)
+names(spec)=c("p=1, q=0", "p=2, q=0", "p=3, q=0", "p=4, q=0", "p=5, q=0", "p=1, q=1", "p=1, q=2", "p=2, q=1", "p=2, q=2")
 
+fit=list()
+infocrit=as.data.frame(matrix(NA, 4, length(spec)))
+rownames(infocrit)=c("Akaike", "Bayes", "Shibata", "Hannan-Qinn")
+for(i in 1:length(spec)){
+
+  fit[[i]]=NA
+  
+  errortest=tryCatch(
+    ugarchfit(spec=spec[[i]], data=returns, solver="hybrid"),
+    error=function(e) e
+    )
+  if(!inherits(errortest, "error")){
+    fit[[i]]=ugarchfit(spec=spec[[i]], data=returns, solver="hybrid")
+  }
+
+  errortest=tryCatch(
+    infocriteria(fit[[i]]),
+    error=function(e) e
+    )
+  if(!inherits(errortest, "error")){
+    infocrit[,i]=infocriteria(fit[[i]])
+  }
+}
+names(fit)=names(spec)
+modelselection=as.data.frame(matrix(NA, nrow(infocrit), 2))
+rownames(modelselection)=rownames(infocrit)
+for(j in 1:nrow(infocrit)) modelselection[j,1]=which.min(infocrit[j,])
+for(j in 1:nrow(modelselection)) modelselection[j,2]=names(spec)[modelselection[j,1]]
+
+#JB test
+jarque.bera.test(residuals(fit[[6]]))
+jarque.bera.test(residuals(fit[[8]]))
+jarque.bera.test(returns)
+
+#From here, we proceed using the GARCH(1,1) model
+garch11=fit[[6]]
+parameters=fit[[6]]@fit$matcoef
+parameters[5,1]+parameters[6,1]
+#The paramteres are very close to summing to one
