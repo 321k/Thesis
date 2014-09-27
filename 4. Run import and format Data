@@ -95,7 +95,7 @@ GT.list[[i]]=merge(GT.list[[i]], stocks.volume[,i])
 GT.list[[i]]=merge(GT.list[[i]], stocks.f[,i])
 GT.list[[i]]=merge(GT.list[[i]], stocks.var[,i])
 GT.list[[i]]=merge(GT.list[[i]], GT.detrended[,i])
-colnames(GT.list[[i]])=c("Detrended traded volume", "Traded volume" "Return", "Return^2", "SVI")
+colnames(GT.list[[i]])=c("Detrended traded volume", "Traded volume", "Return", "Return^2", "SVI")
 }
 names(GT.list)=tolower(ftse.components[index,6])
 
