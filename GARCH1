@@ -7,12 +7,14 @@ library(tseries)
 
 #Data for FTSE 100
 data=GT.list[[29]]
-data=data[-which(is.na(data[,2])),]
-volume=data[,1]
-returns=data[,2]
-volatility=data[,3]
-SVI=as.matrix(na.approx(data[,4], na.rm=FALSE))
+data=data[-which(is.na(data[,3])),]
+detrendedvolume=data[,1]
+volume=data[,2]
+returns=data[,3]
+volatility=data[,4]
+SVI=as.matrix(na.approx(data[,5], na.rm=FALSE))
 SVI[which(is.na(SVI)),]=0
+SVIandVOL=as.matrix(data.frame(SVI, volatility))
 
 
 par(mfrow=c(3,1))
@@ -97,12 +99,16 @@ spec[[i]]=ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1, 1
 i=i+1
 spec[[i]]=ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1, 1), external.regressors=SVI), distribution.model="std")
 i=i+1
+spec[[i]]=ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1, 1), external.regressors=SVIandVOL), distribution.model="std")
+i=i+1
 
-names(spec)=c("p=1, q=0", "p=2, q=0", "p=3, q=0", "p=4, q=0", "p=5, q=0", "p=1, q=1", "p=1, q=2", "p=2, q=1", "p=2, q=2", "p=1, q=1, eGARCH, Std", "p=1, q=1, eGARCH, Std, Volume", "p=1, q=1, eGARCH, Std, Volatility", "p=1, q=1, eGARCH, Std, SVI")
+names(spec)=c("p=1, q=0", "p=2, q=0", "p=3, q=0", "p=4, q=0", "p=5, q=0", "p=1, q=1", "p=1, q=2", "p=2, q=1", "p=2, q=2", "p=1, q=1, eGARCH, Std", "p=1, q=1, eGARCH, Std, Volume", "p=1, q=1, eGARCH, Std, Volatility", "p=1, q=1, eGARCH, Std, SVI", "p=1, q=1, eGARCH, Std, SVI & vol.")
 
 fit=list()
 infocrit=as.data.frame(matrix(NA, 4, length(spec)))
+colnames(infocrit)=names(spec)
 rownames(infocrit)=c("Akaike", "Bayes", "Shibata", "Hannan-Qinn")
+
 for(i in 1:length(spec)){
 
   fit[[i]]=NA
