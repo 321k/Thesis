@@ -1,0 +1,62 @@
+par(mfrow=c(1,2))
+#ftse data
+i=26
+ftse=GT.list[[i]]
+ftse=merge(ftse, stocks.raw[[i]][,4])
+
+#Unliever
+j=69
+stock=GT.list[[j]]
+stock=merge(stock, stocks.raw[[j]][,4])
+
+#grafer med pris, avkastningar och kvadrerade avkastningar
+par(mfrow=c(1,2))
+plot(ftse[,6], main="FTSE 100 pris")
+plot(stock[,6], main=paste(names(GT)[j], "pris"))
+
+par(mfrow=c(1,2))
+plot(ftse[,3], main="FTSE 100 avkastning")
+plot(stock[,3], main=paste(names(GT)[j], "avkastning"))
+
+par(mfrow=c(1,2))
+plot(ftse[,3]^2, main="FTSE 100 avkastning^2")
+plot(stock[,3]^2, main=paste(names(GT)[j], "avkastning^2"))
+
+par(mfrow=c(2,2))
+acf(ftse[-which(is.na(ftse[,3])),3], main="FTSE 100 avkastningar")
+acf(stock[-which(is.na(ftse[,3])),3], main=paste(names(GT)[j], "avkastningar"))
+acf(ftse[-which(is.na(ftse[,3])),3]^2, main="FTSE 100 avkastningar^2")
+acf(stock[-which(is.na(ftse[,3])),3]^2, main=paste(names(GT)[j], "avkastningar^2"))
+
+#Histogram
+par(mfrow=c(1,2))
+stock_r=stock[-which(is.na(stock[,3])),3]
+ftse_r=ftse[-which(is.na(ftse[,3])),3]
+
+hist(ftse_r,breaks = 20, freq=F,main="FTSE 100 histogram, density curve",xlab="Avkastning", ylab="density", ylim=c(0,30))
+lines(density(ftse_r), col="red", lwd=2) 
+curve(dnorm(x, mean = mean(ftse_r), sd = sd(ftse_r)), add=TRUE, col="blue",lwd=2)
+
+hist(stock_r,breaks = 20, freq=F,main=paste(names(GT)[j], "histogram, density curve"), xlab="Avkastning",ylab="density", ylim=c(0,40))
+lines(density(stock_r), col="red", lwd=2) 
+curve(dnorm(x, mean = mean(stock_r), sd = sd(stock_r)), add=TRUE, col="blue",lwd=2)
+
+library(e1071)
+kurtosis(ftse_r)
+kurtosis(stock_r)
+
+stock_r_p=stock_r
+stock_r_p[which(stock_r_p<0)]=0
+cor(stock_r_p, abs(stock_r))
+
+stock_r_m=stock_r
+stock_r_m[which(stock_r_m>0)]=0
+cor(stock_r_m, abs(stock_r))
+
+ftse_r_p=ftse_r
+ftse_r_p[which(ftse_r_p<0)]=0
+cor(ftse_r_p, abs(ftse_r))
+
+ftse_r_m=ftse_r
+ftse_r_m[which(ftse_r_m>0)]=0
+cor(ftse_r_m, abs(ftse_r))
