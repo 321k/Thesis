@@ -60,3 +60,20 @@ cor(ftse_r_p, abs(ftse_r))
 ftse_r_m=ftse_r
 ftse_r_m[which(ftse_r_m>0)]=0
 cor(ftse_r_m, abs(ftse_r))
+
+
+#Test correlation between volatility and traded volume
+par(mfrow=c(1,2))
+ftse_volume=as.data.frame(ftse[-which(is.na(ftse[,4])),2])
+ftse_var=as.data.frame(ftse[-which(is.na(ftse[,4])),4])
+ccf(ftse_var[,1], ftse_volume[,1], main="FTSE 100")
+
+stock_volume=as.data.frame(stock[-which(is.na(stock[,4])),2])
+stock_var=as.data.frame(stock[-which(is.na(stock[,4])),4])
+ccf(stock_var[,1], stock_volume[,1], main="Vodafone Group")
+
+par(mfrow=c(2,2))
+acf(ftse_var[,1], main="FTSE 100 volatilitet")
+acf(stock_var[,1], main="Vodafone volatilitet")
+acf(ftse_volume[,1], main="FTSE 100 handlad volym")
+acf(stock_volume[,1], main="Vodafone handlad volym")
