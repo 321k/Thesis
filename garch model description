@@ -4,7 +4,7 @@ i=26
 ftse=GT.list[[i]]
 ftse=merge(ftse, stocks.raw[[i]][,4])
 
-#Unliever
+#Vodafone
 j=69
 stock=GT.list[[j]]
 stock=merge(stock, stocks.raw[[j]][,4])
