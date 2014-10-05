@@ -20,13 +20,24 @@ abSearch.data[[i]][sample[j],3]=(abSearch.data[[i]][sample[j],1]-mean(abSearch.d
 }
 
 
-plot(abSearch.data[[i]][,1], abSearch.data[[i]][,3])
-
-plot(abSearch.data[[i]][,3], col="red", type="l")
-lines(abSearch.data[[i]][,1], type="l")
-i=i+1
+#Here are some nice graphs to illustrate the change
+p1=hist(abSearch.data[[i]][,1])
+p2=hist(abSearch.data[[i]][,3])
+xmin=min(p1$breaks, p2$breaks)
+xmax=max(p1$breaks, p2$breaks)
+ymin=0
+ymax=max(p1$counts, p2$counts)
 
 par(mfrow=c(2,1))
-hist(abSearch.data[[i]][,1])
-hist(abSearch.data[[i]][,3])
+plot( p1, col=rgb(0,0,1,1/4),xlim=c(xmin, xmax), ylim=c(ymin, ymax), main=names(GT)[i], xlab="red=detrended, blue=raw data")
+plot( p2, col=rgb(1,0,0,1/4), xlim=c(xmin, xmax), ylim=c(ymin, ymax), add=T)
+
+#plot(abSearch.data[[i]][,1], abSearch.data[[i]][,3])
+ymin=min(abSearch.data[[i]][,1], abSearch.data[[i]][,3], na.rm=T)
+ymax=max(abSearch.data[[i]][,1], abSearch.data[[i]][,3], na.rm=T)
+
+date=as.Date(rownames(abSearch.data[[i]]), "%Y-%m-%d")
+plot(date, abSearch.data[[i]][,1], type="l", ylim=c(ymin, ymax), main=names(GT)[i], ylab="SVI", col="blue", xlab="Datum")
+lines(date, abSearch.data[[i]][,3], col="red")
 i=i+1
+
