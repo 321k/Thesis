@@ -45,22 +45,34 @@ library(e1071)
 kurtosis(ftse_r)
 kurtosis(stock_r)
 
-stock_r_p=stock_r
-stock_r_p[which(stock_r_p<0)]=0
-cor(stock_r_p, abs(stock_r))
+#Test for leverage effect
 
-stock_r_m=stock_r
-stock_r_m[which(stock_r_m>0)]=0
-cor(stock_r_m, abs(stock_r))
+stock_r_pos=stock_r
+stock_r_pos[which(stock_r_pos<0)]=0
+cor(stock_r_pos, abs(stock_r))
 
-ftse_r_p=ftse_r
-ftse_r_p[which(ftse_r_p<0)]=0
-cor(ftse_r_p, abs(ftse_r))
+stock_r_neg=stock_r
+stock_r_neg[which(stock_r_neg>0)]=0
+cor(stock_r_neg, abs(stock_r))
 
-ftse_r_m=ftse_r
-ftse_r_m[which(ftse_r_m>0)]=0
-cor(ftse_r_m, abs(ftse_r))
+ftse_r_pos=ftse_r
+ftse_r_pos[which(ftse_r_pos<0)]=0
+cor(ftse_r_pos, abs(ftse_r))
 
+ftse_r_neg=ftse_r
+ftse_r_neg[which(ftse_r_neg>0)]=0
+cor(ftse_r_neg, abs(ftse_r))
+
+par(mfrow=c(2,2))
+
+ftse_neg=ccf(as.data.frame(ftse_r_neg)[,1], abs(as.data.frame(ftse_r)[,1]), main="FTSE 100, negative")
+stock_neg=ccf(as.data.frame(stock_r_neg)[,1], abs(as.data.frame(stock_r)[,1]), main="Vodafone Group, negative")
+ftse_pos=ccf(as.data.frame(ftse_r_pos)[,1], abs(as.data.frame(ftse_r)[,1]), main="FTSE 100, postive")
+stock_pos=ccf(as.data.frame(stock_r_pos)[,1], abs(as.data.frame(stock_r)[,1]), main="Vodafone Group, postivie")
+stock_neg$acf
+stock_pos$acf
+ftse_neg$acf
+ftse_pos$acf
 
 #Test correlation between volatility and traded volume
 par(mfrow=c(1,2))
@@ -77,3 +89,4 @@ acf(ftse_var[,1], main="FTSE 100 volatilitet")
 acf(stock_var[,1], main="Vodafone volatilitet")
 acf(ftse_volume[,1], main="FTSE 100 handlad volym")
 acf(stock_volume[,1], main="Vodafone handlad volym")
+
