@@ -1,1 +1,32 @@
-data=GT
+#Data used is GT.xts from file 4.
+abSearch.data=list()
+
+
+for(i in 1:ncol(GT.xts)){
+
+GT.date=index(GT.xts)
+abSearch.data[[i]]=data.frame(GT.xts[,i], as.data.frame(as.factor(weekdays(GT.date))))
+abSearch.data[[i]]=abSearch.data[[i]][-which(is.na(abSearch.data[[i]][,1])),]
+
+abSearch.data[[i]][,3]=NA
+weekdays=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+
+for(k in 1:length(weekdays)){
+sample=which(abSearch.data[[i]][,2]==weekdays[k])
+for(j in 11:length(sample)){
+abSearch.data[[i]][sample[j],3]=(abSearch.data[[i]][sample[j],1]-mean(abSearch.data[[i]][sample[(j-11):(j-1)],1]))
+}
+}
+}
+
+
+plot(abSearch.data[[i]][,1], abSearch.data[[i]][,3])
+
+plot(abSearch.data[[i]][,3], col="red", type="l")
+lines(abSearch.data[[i]][,1], type="l")
+i=i+1
+
+par(mfrow=c(2,1))
+hist(abSearch.data[[i]][,1])
+hist(abSearch.data[[i]][,3])
+i=i+1
