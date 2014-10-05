@@ -104,9 +104,12 @@ start=3500
 stop=dim(GT)[1]
 p1=hist(GT[,i])
 p2=hist(GT.detrended[,i])
+min=min(p1$breaks, p2$breaks)
+max=max(p1$breaks, p2$breaks)
+
 par(mfrow=c(3,2))
-plot( p1, col=rgb(0,0,1,1/4),xlim=c(min(p1$breaks, p2$breaks),max(p1$breaks, p2$breaks)), main=names(GT)[i], xlab="red=detrended, blue=raw data")
-plot( p2, col=rgb(1,0,0,1/4), xlim=c(min(p1$breaks, p2$breaks),max(p1$breaks, p2$breaks)), add=T)
+plot( p1, col=rgb(0,0,1,1/4),xlim=c(min, max), main=names(GT)[i], xlab="red=detrended, blue=raw data")
+plot( p2, col=rgb(1,0,0,1/4), xlim=c(min, max), add=T)
 plot(GT[,i], GT.detrended[,i], main=names(GT)[i], xlab="Raw data", ylab="Detrended data")
 plot(GT.date[start:stop], GT[,i][start:stop], type="l", main=names(GT)[i], xlab="Raw data", ylab="SVI")
 plot(GT.date, GT[,i], type="l", main=names(GT)[i], xlab="Raw data", ylab="SVI")
