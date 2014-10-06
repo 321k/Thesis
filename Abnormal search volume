@@ -1,28 +1,30 @@
 #Data used is GT.xts from file 4.
-abSearch.data=list()
+#The method is recommended by Drake, Roulstone and Thornock (2012)
+
+abSearch=list()
 
 
 for(i in 1:ncol(GT.xts)){
 
 GT.date=index(GT.xts)
-abSearch.data[[i]]=data.frame(GT.xts[,i], as.data.frame(as.factor(weekdays(GT.date))))
-abSearch.data[[i]]=abSearch.data[[i]][-which(is.na(abSearch.data[[i]][,1])),]
+abSearch[[i]]=data.frame(GT.xts[,i], as.data.frame(as.factor(weekdays(GT.date))))
+abSearch[[i]]=abSearch[[i]][-which(is.na(abSearch[[i]][,1])),]
 
-abSearch.data[[i]][,3]=NA
+abSearch[[i]][,3]=NA
 weekdays=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
 for(k in 1:length(weekdays)){
-sample=which(abSearch.data[[i]][,2]==weekdays[k])
+sample=which(abSearch[[i]][,2]==weekdays[k])
 for(j in 11:length(sample)){
-abSearch.data[[i]][sample[j],3]=(abSearch.data[[i]][sample[j],1]-mean(abSearch.data[[i]][sample[(j-11):(j-1)],1]))
+abSearch[[i]][sample[j],3]=(abSearch[[i]][sample[j],1]-mean(abSearch[[i]][sample[(j-11):(j-1)],1]))
 }
 }
 }
 
 
 #Here are some nice graphs to illustrate the change
-p1=hist(abSearch.data[[i]][,1])
-p2=hist(abSearch.data[[i]][,3])
+p1=hist(abSearch[[i]][,1])
+p2=hist(abSearch[[i]][,3])
 xmin=min(p1$breaks, p2$breaks)
 xmax=max(p1$breaks, p2$breaks)
 ymin=0
@@ -32,12 +34,64 @@ par(mfrow=c(2,1))
 plot( p1, col=rgb(0,0,1,1/4),xlim=c(xmin, xmax), ylim=c(ymin, ymax), main=names(GT)[i], xlab="red=detrended, blue=raw data")
 plot( p2, col=rgb(1,0,0,1/4), xlim=c(xmin, xmax), ylim=c(ymin, ymax), add=T)
 
-#plot(abSearch.data[[i]][,1], abSearch.data[[i]][,3])
-ymin=min(abSearch.data[[i]][,1], abSearch.data[[i]][,3], na.rm=T)
-ymax=max(abSearch.data[[i]][,1], abSearch.data[[i]][,3], na.rm=T)
+#plot(abSearch[[i]][,1], abSearch[[i]][,3])
+ymin=min(abSearch[[i]][,1], abSearch[[i]][,3], na.rm=T)
+ymax=max(abSearch[[i]][,1], abSearch[[i]][,3], na.rm=T)
 
-date=as.Date(rownames(abSearch.data[[i]]), "%Y-%m-%d")
-plot(date, abSearch.data[[i]][,1], type="l", ylim=c(ymin, ymax), main=names(GT)[i], ylab="SVI", col="blue", xlab="Datum")
-lines(date, abSearch.data[[i]][,3], col="red")
+date=as.Date(rownames(abSearch[[i]]), "%Y-%m-%d")
+plot(date, abSearch[[i]][,1], type="l", ylim=c(ymin, ymax), main=names(GT)[i], ylab="SVI", col="blue", xlab="Datum")
+lines(date, abSearch[[i]][,3], col="red")
 i=i+1
+
+####What method is better, detrending for day of the week effects over the entire sample, or the ten weeks back method?
+jbtest_rolling=list()
+jbtest_detrended=list()
+for(i in 1:length(GT.list)){
+detrendedSVI=GT.list[[i]][,5]
+rollingSVI=as.data.frame(abSearch[[i]][,3])
+rownames(rollingSVI)=as.Date(rownames(abSearch[[i]]), "%Y-%m-%d")
+rollingSVI=as.xts(rollingSVI)
+index(rollingSVI)=as.Date(rownames(abSearch[[i]]), "%Y-%m-%d")
+comparison_SVI=merge(rollingSVI, detrendedSVI)
+colnames(comparison_SVI)=c("Rolling", "Detrended")
+comparison_SVI_df=as.data.frame(comparison_SVI)
+
+#Jarque bera test
+jbtest_rolling[[i]]=jarque.bera.test(rollingSVI[-which(is.na(rollingSVI)),])
+jbtest_detrended[[i]]=jarque.bera.test(detrendedSVI[-which(is.na(detrendedSVI)),])
+}
+
+jbtest=as.data.frame(matrix(NA, nrow=length(jbtest_rolling), ncol=3))
+colnames(jbtest)=c("Company", "Rolling", "Detrended")
+for(i in 1:length(jbtest_rolling)){
+jbtest[i,1]=names(GT)[i]
+jbtest[i,2]=jbtest_rolling[[i]]$statistic
+jbtest[i,3]=jbtest_detrended[[i]]$statistic
+}
+
+#And some graphs
+p1=hist(comparison_SVI_df[,1])
+p2=hist(comparison_SVI_df[,2])
+xmin=min(p1$breaks, p2$breaks)
+xmax=max(p1$breaks, p2$breaks)
+ymin=0
+ymax=max(p1$counts, p2$counts)
+
+par(mfrow=c(2,1))
+plot( p1, col=rgb(0,0,1,1/4),xlim=c(xmin, xmax), ylim=c(ymin, ymax), main=names(GT)[i], xlab="röd=abnormal sökvolym, blå=genomsnittlig veckodagseffekt")
+plot( p2, col=rgb(1,0,0,1/4), xlim=c(xmin, xmax), ylim=c(ymin, ymax), add=T)
+
+#plot(comparison_SVI_df[,1], comparison_SVI_df[,2])
+
+start=2800
+stop=3000
+
+ymin=min(comparison_SVI_df[start:stop,1], comparison_SVI_df[start:stop,2], na.rm=T)
+ymax=max(abSearch[[i]][start:stop,1], comparison_SVI_df[start:stop,2], na.rm=T)
+
+date=as.Date(rownames(comparison_SVI_df), "%Y-%m-%d")
+plot(date[start:stop], comparison_SVI_df[start:stop,1], type="l", ylim=c(ymin, ymax), main=names(GT)[i], ylab="SVI", col="blue", xlab="Datum")
+lines(date[start:stop], comparison_SVI_df[start:stop,2], col="red")
+
+
 
