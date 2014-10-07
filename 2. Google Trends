@@ -11,7 +11,7 @@ return(res)
 
 
 summaryTable=function(rawGT){
-  x=data.frame(matrix(NA, nrow=length(rawGT), ncol=10))
+  x=data.frame(matrix(NA, nrow=length(rawGT), ncol=11))
   for(i in 1:length(rawGT)){
 #List all querries
     x[i,1]=substr(rawGT[[i]][1,1], start=22, stop=70)
@@ -46,8 +46,13 @@ summaryTable=function(rawGT){
     if(length(temp)>0) {
       x[i,10]=temp
     }
+    
+  #Number of queries in csv
+  x[i,11]=ncol(rawGT[[i]])-1
+  
   }
-  colnames(x)=c("Querry", "Rows", "Columns", "Empty rows", "Start", "End", "Date", "Type", "Top cities", "Top region")
+  
+  colnames(x)=c("Querry", "Rows", "Columns", "Empty rows", "Start", "End", "Date", "Type", "Top cities", "Top region", "Number of queries")
   return(x)
 }
 
