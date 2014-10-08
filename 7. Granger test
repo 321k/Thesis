@@ -1,0 +1,26 @@
+library(MSBVAR)
+granger_test=as.data.frame(matrix(NA, nrow=0, ncol=5))
+
+for(i in 1:length(GT.list)){
+
+data=GT.list[[i]]
+if(length(which(is.na(data[,2])))>0) data=data[-which(is.na(data[,2])),]
+if(length(which(is.na(data[,6])))>0) data=data[-which(is.na(data[,6])),]
+data=data[,-1]
+
+lags=c(2,4,6,8,10,12)
+
+for(j in lags) {
+
+test=granger.test(data, p=j)
+test=as.data.frame(test)
+test[,3]=j
+test[,4]=names(GT)[i]
+test[,5]=nrow(data)
+colnames(test)[3]="lags"
+colnames(test)[4]="names"
+colnames(test)[5]="observations"
+
+granger_test=rbind(granger_test, test)
+}
+}
