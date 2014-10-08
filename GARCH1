@@ -15,12 +15,14 @@ volatility=data[,4]
 SVI=as.matrix(na.approx(data[,5], na.rm=FALSE))
 SVI[which(is.na(SVI)),]=0
 SVIandVOL=as.matrix(data.frame(SVI, volatility))
+abSearch=as.matrix(na.approx(data[,6], na.rm=FALSE))
+abSearch[which(is.na(abSearch)),]=0
+abSearchandVOL=as.matrix(data.frame(abSearch, volatility))
 
-
-par(mfrow=c(3,1))
-plot(returns)
-plot(returns^2)
-plot(abs(returns))
+#par(mfrow=c(3,1))
+#plot(returns)
+#plot(returns^2)
+#plot(abs(returns))
 
 acf(returns)
 acf(returns^2)
@@ -69,6 +71,7 @@ BoxTest[[i]]=Box.test(returns^2, lag=5, type=("Ljung-Box"), fitdf=0)
 i=i+1
 BoxTest[[i]]=Box.test(returns^2, lag=10, type=("Ljung-Box"), fitdf=0)
 
+
 #Model selection, most negative information criteria is best
 #str(fit)
 spec=list()
@@ -101,8 +104,12 @@ spec[[i]]=ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1, 1
 i=i+1
 spec[[i]]=ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1, 1), external.regressors=SVIandVOL), distribution.model="std")
 i=i+1
+spec[[i]]=ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1, 1), external.regressors=abSearch), distribution.model="std")
+i=i+1
 
 names(spec)=c("p=1, q=0", "p=2, q=0", "p=3, q=0", "p=4, q=0", "p=5, q=0", "p=1, q=1", "p=1, q=2", "p=2, q=1", "p=2, q=2", "p=1, q=1, eGARCH, Std", "p=1, q=1, eGARCH, Std, Volume", "p=1, q=1, eGARCH, Std, Volatility", "p=1, q=1, eGARCH, Std, SVI", "p=1, q=1, eGARCH, Std, SVI & vol.")
+
+
 
 fit=list()
 infocrit=as.data.frame(matrix(NA, 4, length(spec)))
@@ -134,6 +141,8 @@ modelselection=as.data.frame(matrix(NA, nrow(infocrit), 2))
 rownames(modelselection)=rownames(infocrit)
 for(j in 1:nrow(infocrit)) modelselection[j,1]=which.min(infocrit[j,])
 for(j in 1:nrow(modelselection)) modelselection[j,2]=names(spec)[modelselection[j,1]]
+
+
 #colnames(infocrit)=names(spec)
 #JB test
 jarque.bera.test(residuals(fit[[6]]))
