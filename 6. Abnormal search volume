@@ -1,6 +1,6 @@
 #Data used is GT.xts from file 4.
 #The method is recommended by Drake, Roulstone and Thornock (2012)
-
+library(tseries)
 abSearch=list()
 
 
@@ -92,6 +92,24 @@ ymax=max(abSearch[[i]][start:stop,1], comparison_SVI_df[start:stop,2], na.rm=T)
 date=as.Date(rownames(comparison_SVI_df), "%Y-%m-%d")
 plot(date[start:stop], comparison_SVI_df[start:stop,1], type="l", ylim=c(ymin, ymax), main=names(GT)[i], ylab="SVI", col="blue", xlab="Datum")
 lines(date[start:stop], comparison_SVI_df[start:stop,2], col="red")
+
+### Now add abSearch to GT.list
+for(i in 1:length(GT.list)){
+date=as.Date(rownames(abSearch[[i]]), "%Y-%m-%d")
+abS=abSearch[[i]][,3,drop=F]
+abS=as.xts(abS)
+index(abS)=date
+GT.list[[i]]=merge(GT.list[[i]], abS)
+colnames(GT.list[[i]])[6]="abSearch"
+}
+
+#And some plots
+
+par(mfrow=c(2,1))
+plot(GT.list[[i]][,5])
+lines(GT.list[[i]][,6], col="red")
+i=i+1
+
 
 
 
