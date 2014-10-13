@@ -1,25 +1,31 @@
+library(rugarch)
 #GARCH
 #eGARCHstd
 #GARCH_67
 #eGARCH_67
 
-#spec=ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1, 1)))
-#spec=ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1, 1)), distribution.model="std")
-#spec=ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1, 1), external.regressors=data[,6:7]))
-spec=ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1, 1), external.regressors=data[,6:7]))
 
 fit=list()
 
 for(i in 1:length(GT.list)){
 market_id=GT.list[[29]][,6]
+colnames(market_id)="FTSE abSearch"
 data=GT.list[[i]]
 data=merge(data, market_id)
+
+
 
 data=data[-which(is.na(data[,3])),]
 data[,5]=as.matrix(na.approx(data[,5], na.rm=FALSE))
 data[,6]=as.matrix(na.approx(data[,6], na.rm=FALSE))
 data[,7]=as.matrix(na.approx(data[,7], na.rm=FALSE))
 if(length(which(is.na(data[,6])))>0) data=data[-which(is.na(data[,6])),]
+
+
+spec_vanilla=ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1, 1)))
+#spec=ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1, 1)), distribution.model="std")
+spec=ugarchspec(variance.model = list(model = "sGARCH", garchOrder = c(1, 1), external.regressors=data[,6:7]))
+#spec=ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1, 1), external.regressors=data[,6:7]))
 
 
 
@@ -32,3 +38,18 @@ if(!inherits(errortest, "error")){
 fit[[i]]=ugarchfit(spec=spec, data=data[,3], solver="hybrid")
 }
 }
+
+###Then store the parameter values
+results=as.data.frame(matrix(NA, ncol=8,))
+output=data.frame()
+
+for(i in 1:length(fit)){
+
+if(!is.null(fit[[i]])){
+results=fit[[i]]@fit$matcoef
+results=transform(results, new.col=i)
+output=rbind(output, results)
+}
+}
+
+
