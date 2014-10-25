@@ -1,0 +1,25 @@
+library(tseries)
+library(e1071)
+
+##### Table with the names and querries of the sample
+abSearch_desc=data.frame(names(GT.list))
+for(i in 2:14){
+abSearch_desc[i]=NA
+}
+names(abSearch_desc)=c("Company", "Kurtosis", "Skewness", "Mean", "Range", "Sd", "JB", "JBp", "ADF", "ADFp", "PP", "PPp", "KPSS", "KPSSp")
+
+for(i in 1:length(GT.list)){
+data=GT.list[[i]][,6]
+if(length(data[-which(is.na(data[,1])),])>0) data=data[-which(is.na(data[,1])),]
+abSearch_desc[i,2]=kurtosis(data)
+abSearch_desc[i,3]=skewness(data)
+abSearch_desc[i,4]=mean(data)
+abSearch_desc[i,5]=range(data)[2]
+abSearch_desc[i,6]=sd(data)
+abSearch_desc[i,7]=jarque.bera.test(data)[[1]]
+abSearch_desc[i,8]=jarque.bera.test(data)[[3]]
+abSearch_desc[i,9]=adf.test(data, k=0)
+abSearch_desc[i,9]=adf.test(data, k=0)
+abSearch_desc[i,10]=PP.test(data
+abSearch_desc[i,11]
+}
