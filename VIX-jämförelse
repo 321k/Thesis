@@ -7,28 +7,5 @@ ftse.vix=ftse.vix[2]
 ftse.vix=as.xts(ftse.vix)
 index(ftse.vix)=ftse.vix.date
 ftse.implied_vol=merge(ftse.vix, GT.list[[29]][,6])
-data=ftse.implied_vol[-which(is.na(ftse.implied_vol[,2])),]
-data=data[-which(is.na(data[,1])),]
-### And a plot of the data
-
-#start=2000
-#stop=nrow(temp)-500
-
-
-plot.new()
-temp=as.data.frame(ftse.vix)
-
-date=as.Date(rownames(temp), "%Y-%m-%d")
-par(mfrow=c(2,1))
-plot(date[start:stop], temp[,1][start:stop], type="l", ylab="Implied volatility, FTSE 100", main="FTSE 100", xlab="Date")
-par(new=T)
-plot(date[start:stop], temp[,2][start:stop], type="l", col="red", axes=F, xlab=NA, ylab=NA)
-axis(side=4)
-mtext(side=4, line=3, "Searches for FTSE 100")
-
-plot(temp[,2][start:stop], temp[,1][start:stop], ylab="Implied volatility", xlab="Searches, FTSE 100")
-y=temp[,1][start:stop]
-x=temp[,2][start:stop]
-fit=lm(y~x)
-summary(fit)
-abline(fit)
+ftse.implied_vol=ftse.implied_vol[-which(is.na(ftse.implied_vol[,2])),]
+ftse.implied_vol=ftse.implied_vol[-which(is.na(ftse.implied_vol[,1])),]
