@@ -1,0 +1,34 @@
+##Panel data
+library(foreign)
+
+output=vector()
+for(i in 1:length(GT.list)){
+
+temp=length(which(is.na(GT.list[[i]][,6])))
+
+output=append(output, temp)
+}
+
+selector=which(output==79)
+
+newList=GT.list[selector]
+ftse=GT.list[[29]]
+
+panelData=data.frame()
+for(i in 1:length(newList)){
+temp_panel=as.data.frame(newList[[i]])
+temp_panel[ncol(temp_panel)+1]=as.data.frame(index(newList[[i]]))
+temp_panel[ncol(temp_panel)+1]=names(newList)[i]
+panelData=rbind(panelData, temp_panel)
+}
+
+names(panelData)[7]="Date"
+names(panelData)[8]="Name"
+panelData[,7]=as.Date(panelData[,7], "%Y-%m-%d")
+
+panelData=panelData[c(8, 7, 2, 3, 4, 5, 6)]
+
+panelData_volume=panelData[c(1,2,3,7)]
+names(panelData_volume)=c("Name", "Date", "y", "x")
+panelData_variance=panelData[c(1,2,5,7)]
+names(panelData_variance)=c("Name", "Date", "y", "x")
