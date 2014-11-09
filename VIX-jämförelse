@@ -6,9 +6,9 @@ rownames(ftse.vix)=ftse.vix.date
 ftse.vix=ftse.vix[2]
 ftse.vix=as.xts(ftse.vix)
 index(ftse.vix)=ftse.vix.date
-ftse.vix=merge(ftse.vix, GT.detrended$'FTSE 100')
-
-
+ftse.implied_vol=merge(ftse.vix, GT.list[[29]][,6])
+data=ftse.implied_vol[-which(is.na(ftse.implied_vol[,2])),]
+data=data[-which(is.na(data[,1])),]
 ### And a plot of the data
 
 #start=2000
