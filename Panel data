@@ -1,5 +1,7 @@
 ##Panel data
+#Instructions: http://www.princeton.edu/~otorres/Panel101R.pdf
 library(foreign)
+library(plm)
 
 output=vector()
 for(i in 1:length(GT.list)){
@@ -32,3 +34,13 @@ panelData_volume=panelData[c(1,2,3,7)]
 names(panelData_volume)=c("Name", "Date", "y", "x")
 panelData_variance=panelData[c(1,2,5,7)]
 names(panelData_variance)=c("Name", "Date", "y", "x")
+
+
+#testing for fixed versus random effect with haussman
+fixed_volume=plm(y~x, data=panelData_volume, index=c("Name", "Date"), model="within")
+random_volume=plm(y~x, data=panelData_volume, index=c("Name", "Date"), model="random")
+haussman_volume=phtest(fixed_volume, random_volume)
+
+fixed_variance=plm(y~x, data=panelData_variance, index=c("Name", "Date"), model="within")
+random_variance=plm(y~x, data=panelData_variance, index=c("Name", "Date"), model="random")
+haussman_variance=phtest(fixed_variance, random_variance)
