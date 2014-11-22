@@ -10,3 +10,30 @@ ftse.implied_vol=merge(ftse.vix, GT.list[[29]][,6])
 ftse.implied_vol=ftse.implied_vol[-which(is.na(ftse.implied_vol[,2])),]
 ftse.implied_vol=ftse.implied_vol[-which(is.na(ftse.implied_vol[,1])),]
 ftse.implied_vol=as.data.frame(ftse.implied_vol)
+ftse.implied_vol[3]=log(ftse.implied_vol[,1])
+ftse.implied_vol[4]=NA
+ftse.implied_vol[5]=NA
+ftse.implied_vol[6]=0
+
+names(ftse.implied_vol)[3:6]=c("ln_close", "prediction", "actual", "match")
+
+for(i in 2:nrow(ftse.implied_vol)){
+
+if((ftse.implied_vol[i,2]-ftse.implied_vol[i-1,2])>0) {
+  ftse.implied_vol[i,4]="Up"
+} else {ftse.implied_vol[i,4]="Down"}
+
+if((ftse.implied_vol[i,1]-ftse.implied_vol[i-1,1])>0) {
+  ftse.implied_vol[i,5]="Up"
+} else {ftse.implied_vol[i,5]="Down"}
+
+if(ftse.implied_vol[i,4]==ftse.implied_vol[i,5]) {
+  ftse.implied_vol[i,6]=1
+} else {ftse.implied_vol[i,6]=0}
+
+}
+
+#540 cases correctly predicted out of 1011. 
+
+
+#test
