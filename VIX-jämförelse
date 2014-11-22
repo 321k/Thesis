@@ -10,6 +10,3 @@ ftse.implied_vol=merge(ftse.vix, GT.list[[29]][,6])
 ftse.implied_vol=ftse.implied_vol[-which(is.na(ftse.implied_vol[,2])),]
 ftse.implied_vol=ftse.implied_vol[-which(is.na(ftse.implied_vol[,1])),]
 ftse.implied_vol=as.data.frame(ftse.implied_vol)
-
-library(corrgram)
-corrgram(ftse.implied_vol)
