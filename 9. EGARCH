@@ -1,0 +1,27 @@
+#Uses the data frames panelData and ftse
+library(rugarch)
+fit=list()
+
+
+companies=unique(panelData$Name)
+ugarchData=panelData[which(is.finite(panelData$SVI)),]
+
+for(i in 1:length(companies)){
+  selector=which(ugarchData$Name==companies[i])
+  temp_data=ugarchData[selector,]
+  temp_data$Return=na.approx(temp_data$Return, na.rm=F)
+  ugarchData[selector,]=temp_data
+}
+
+
+for(i in 1:length(companies)){
+ selector=which(ugarchData$Name==companies[i])
+ 
+ errortest=tryCatch(
+   ugarchfit(spec=spec, data=ugarchData[selector,4], solver="hybrid"),
+   error=function(e) e
+   )
+ if(!inherits(errortest, "error")){
+   fit[[i]]=ugarchfit(spec=spec, data=ugarchData[selector,4], solver="hybrid")
+ }
+}
