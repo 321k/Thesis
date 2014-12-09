@@ -4,7 +4,7 @@ fit=list()
 
 
 companies=unique(panelData$Name)
-ugarchData=panelData[which(is.finite(panelData$SVI)),]
+ugarchData=panelData[which(is.finite(panelData$abSearch)),]
 
 for(i in 1:length(companies)){
   selector=which(ugarchData$Name==companies[i])
@@ -25,3 +25,5 @@ for(i in 1:length(companies)){
    fit[[i]]=ugarchfit(spec=spec, data=ugarchData[selector,4], solver="hybrid")
  }
 }
+
+
