@@ -1,0 +1,79 @@
+
+#Import daily data
+fileDir="C:/Users/erik.johansson/Dropbox/Hanken/Gradu/Trends data"
+setwd(fileDir)
+files=list.files(fileDir)
+dailyData=readGT(files)
+dailyData=dailyData[order(dailyData$Date),]
+
+#Import weekly data
+fileDir="C:/Users/erik.johansson/Dropbox/Hanken/Gradu/Weekly trends data"
+setwd(fileDir)
+files=list.files(fileDir)
+weeklyData=readGT(files)
+
+#Create table for adjusted data
+adjustedDaily=dailyData[1:3]
+
+#Sort data
+adjustedDaily=adjustedDaily[order(adjustedDaily$Keyword),]
+
+#Create list of unique keywords
+uniqueNames=unique(adjustedDaily$Keyword)
+
+#Sort data again
+for(i in 1:length(uniqueNames)){
+	index=which(adjustedDaily$Keyword==uniqueNames[i])
+	selection=adjustedDaily[index,]
+	adjustedDaily[index,]=selection[order(selection$Date),]
+}
+
+#Merge data
+adjustedDaily=merge(adjustedDaily, weeklyData[1:3], by=c("Date", "Keyword"), all=T)
+
+#Sort data
+adjustedDaily=adjustedDaily[order(adjustedDaily$Date),]
+adjustedDaily=adjustedDaily[order(adjustedDaily$Keyword),]
+
+#Create new columns and correct names
+adjustedDaily$Adjustment_factor=NA
+adjustedDaily$Adjusted_daily=NA
+names(adjustedDaily)=c("Date", "Keyword", "Daily", "Weekly", "Adjustment_factor", "Adjusted_daily")
+
+#Correct for date mismatch
+for(j in 1:length(uniqueNames)){
+	index=which(adjustedDaily$Keyword==uniqueNames[j])
+	selection=adjustedDaily[index,]
+
+	for(i in 2:nrow(selection)){
+	    if(is.na(selection$Daily[i])) selection$Daily[i]=selection$Daily[i-1]
+	}
+	adjustedDaily[index,]=selection
+}
+
+#Create adjustment factor
+adjustedDaily$Adjustment_factor=adjustedDaily$Weekly/adjustedDaily$Daily
+
+#Create empty data frame for rbind
+adjustedData=adjustedDaily[1,]
+adjustedData=adjustedData[-1,]
+
+#Remove data before the first available adjustment factor
+for(i in 1:length(uniqueNames)){
+	index=which(adjustedDaily$Keyword==uniqueNames[j])
+	selection=adjustedDaily[index,]
+
+#Remove data beofer first adjustment factor
+	start=which(is.finite(selection$Adjustment_factor))[1]
+	stop=nrow(selection)
+	selection=selection[start:stop,]
+
+#Fill in blanks
+	for(i in 2:nrow(selection)){
+    		if(is.na(selection$Adjustment_factor[i])) selection$Adjustment_factor[i]=selection$Adjustment_factor[i-1]
+	}
+
+	adjustedData=rbind(adjustedData, selection)
+}
+
+adjustedData$Adjusted_daily=adjustedData$Daily*adjustedData$Adjustment_factor
