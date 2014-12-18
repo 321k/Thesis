@@ -1,5 +1,4 @@
-
-#Import daily data
+#Import daily Google trends data
 fileDir="C:/Users/erik.johansson/Dropbox/Hanken/Gradu/Trends data"
 setwd(fileDir)
 files=list.files(fileDir)
@@ -59,7 +58,7 @@ adjustedData=adjustedDaily[1,]
 adjustedData=adjustedData[-1,]
 
 #Remove data before the first available adjustment factor
-for(i in 1:length(uniqueNames)){
+for(j in 1:length(uniqueNames)){
 	index=which(adjustedDaily$Keyword==uniqueNames[j])
 	selection=adjustedDaily[index,]
 
@@ -76,4 +75,8 @@ for(i in 1:length(uniqueNames)){
 	adjustedData=rbind(adjustedData, selection)
 }
 
+#Create daily adjusted data
 adjustedData$Adjusted_daily=adjustedData$Daily*adjustedData$Adjustment_factor
+
+#Read file with stock market data
+stockData=read.csv("C:/Users/erik.johansson/Dropbox/Hanken/Gradu/stock data.csv")
