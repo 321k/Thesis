@@ -64,6 +64,7 @@ for(j in 1:length(uniqueNames)){
 
 #Remove data beofer first adjustment factor
 	start=which(is.finite(selection$Adjustment_factor))[1]
+	if(is.na(start)) next()
 	stop=nrow(selection)
 	selection=selection[start:stop,]
 
@@ -80,3 +81,11 @@ adjustedData$Adjusted_daily=adjustedData$Daily*adjustedData$Adjustment_factor
 
 #Read file with stock market data
 stockData=read.csv("C:/Users/erik.johansson/Dropbox/Hanken/Gradu/stock data.csv")
+stockData=stockData[-1]
+for(i in 1:6) stockData[,i]=as.numeric(stockData[,i])
+stockData[,7]=as.Date(stockData[,7], "%Y-%m-%d")
+stockData[,8]=tolower(as.character(stockData[,8]))
+names(stockData)[8]="Keyword"
+adjustedData=adjustedData[-which(adjustedData$Date>as.Date("30.12.2013", "%d.%m.%Y")),]
+adjustedData=merge(adjustedData, stockData, by=c("Keyword", "Date"))
+
