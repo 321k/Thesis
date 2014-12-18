@@ -86,6 +86,15 @@ for(i in 1:6) stockData[,i]=as.numeric(stockData[,i])
 stockData[,7]=as.Date(stockData[,7], "%Y-%m-%d")
 stockData[,8]=tolower(as.character(stockData[,8]))
 names(stockData)[8]="Keyword"
-adjustedData=adjustedData[-which(adjustedData$Date>as.Date("30.12.2013", "%d.%m.%Y")),]
+
+#Remove data after 31.12.2013
+adjustedData=adjustedData[-which(adjustedData$Date>as.Date("31.12.2013", "%d.%m.%Y")),]
+
+#Merge SVI and stock data
 adjustedData=merge(adjustedData, stockData, by=c("Keyword", "Date"))
 
+#Calculate abSearch
+
+#Set up EGARCH regression
+library(rugarch)
+spec=ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1, 1), external.regressors=data[,6:7]))
